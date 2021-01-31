@@ -18,12 +18,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 public class ModelSaveRestResource implements ModelDataJsonConstants {
@@ -35,20 +36,20 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @RequestMapping(value = {"/service/model/{modelId}/save"}, method = {org.springframework.web.bind.annotation.RequestMethod.PUT})
+    @RequestMapping(value = {"/service/model/{modelId}/save"}, method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public void saveModel(@PathVariable String modelId, @RequestBody MultiValueMap<String, String> values) {
+    public void saveModel(@PathVariable String modelId, HttpServletRequest values) {
         try {
             Model model = this.repositoryService.getModel(modelId);
             System.out.println("ModelSaveRestResource.saveModel----------");
             ObjectNode modelJson = (ObjectNode) this.objectMapper.readTree(model.getMetaInfo());
-            modelJson.put("name", values.getFirst("name"));
-            modelJson.put("description", values.getFirst("description"));
+            modelJson.put("name", values.getParameter("name"));
+            modelJson.put("description", values.getParameter("description"));
             model.setMetaInfo(modelJson.toString());
-            model.setName(values.getFirst("name"));
+            model.setName(values.getParameter("name"));
             this.repositoryService.saveModel(model);
-            this.repositoryService.addModelEditorSource(model.getId(), (values.getFirst("json_xml")).getBytes("utf-8"));
-            InputStream svgStream = new ByteArrayInputStream((values.getFirst("svg_xml")).getBytes("utf-8"));
+            this.repositoryService.addModelEditorSource(model.getId(), (values.getParameter("json_xml")).getBytes("utf-8"));
+            InputStream svgStream = new ByteArrayInputStream((values.getParameter("svg_xml")).getBytes("utf-8"));
             TranscoderInput input = new TranscoderInput(svgStream);
             PNGTranscoder transcoder = new PNGTranscoder();
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();

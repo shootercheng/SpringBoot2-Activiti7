@@ -32,7 +32,7 @@ import java.util.Map;
 public class DeployController extends BaseController {
 
 
-    @PostMapping(path = "deploy")
+    @PostMapping(path = "/deploy")
     @ApiOperation(value = "根据modelId部署流程", notes = "根据modelId部署流程")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "modelId", value = "设计的流程图模型ID", dataType = "String", paramType = "query"),

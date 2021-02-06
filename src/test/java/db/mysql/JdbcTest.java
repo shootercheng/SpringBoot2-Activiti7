@@ -62,8 +62,9 @@ public class JdbcTest {
     @Test
     public void getTable() throws SQLException {
         Connection connection = createConnection(url, userName, password);
+        System.out.println(connection.getSchema());
         DatabaseMetaData databaseMetaData = connection.getMetaData();
-        ResultSet resultSet = databaseMetaData.getTables(connection.getCatalog(),"null",
+        ResultSet resultSet = databaseMetaData.getTables(connection.getCatalog(),null,
             "ACT_RU_EXECUTION",
             new String[]{"TABLE"});
         while (resultSet.next()) {
